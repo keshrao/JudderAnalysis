@@ -12,44 +12,66 @@ difficulty = [2,1,0];
 difficultyName = {'L', 'M', 'S'};
 modeColor = {'b','g','r'};
 
-close all
 
-% --- subject numbers
-for subs = 1:20
+% create my own colormap
+custcmap = buildcmap('wbr');
+
+
+figure(1), clf
+subpnum = 1;
+
+colormap(custcmap);
+
+
+div = 40;
+xvec = linspace(-2,2,div);
+yvec = linspace(2,6,div);
+[xgd, ygd] = meshgrid(xvec, yvec);
+
+
+
+% --- modes
+for mode = 1:3;
     
-    if subs == 13 || subs == 19
-        continue
-    end
     
     
-    % --- modes
-    for mode = 1:3;
-        
-        subject = subjectIDs{subs};
-        subIn = subjectInitial{mode};
-        
-        isLoad = true;
-        
-        if isLoad
-            % logfile
-            % log = xlsread([cd '\KeshRawData\' subject '\' 'selection_log_' subject '_' subIn '.csv']);
-            % detailed data
-            data = xlsread([cd '\KeshRawData\' subject '\' 'selection_detail_log_' subject '_' subIn '.csv']);
-        else
-            disp('File Not Loaded')
-        end
+    % --- difficulty setting
+    for di = 1:3;
         
         
-        %% separate the data into three parts (easy times, med times, hard times)
+        % one matrix per condition
+        gdmat = zeros(div);
         
-        indSplit = find(abs(diff(data(:,1))) > 1000);
-        data1 = data(1:indSplit(1),:);
-        data2 = data(indSplit(1)+1:indSplit(2),:);
-        data3 = data(indSplit(2)+1:end,:);
-        
-        
-        % --- difficulty setting
-        for di = 1:3;
+        % --- subject numbers
+        for subs = 1:20
+            
+            if subs == 13 || subs == 19
+                continue
+            end
+            
+            subject = subjectIDs{subs};
+            subIn = subjectInitial{mode};
+            
+            isLoad = true;
+            
+            if isLoad
+                % logfile
+                % log = xlsread([cd '\KeshRawData\' subject '\' 'selection_log_' subject '_' subIn '.csv']);
+                % detailed data
+                tic
+                data = xlsread([cd '\KeshRawData\' subject '\' 'selection_detail_log_' subject '_' subIn '.csv']);
+                toc
+            else
+                disp('File Not Loaded')
+            end
+            
+            
+            %% separate the data into three parts (easy times, med times, hard times)
+            
+            indSplit = find(abs(diff(data(:,1))) > 1000);
+            data1 = data(1:indSplit(1),:);
+            data2 = data(indSplit(1)+1:indSplit(2),:);
+            data3 = data(indSplit(2)+1:end,:);
             
             
             % separate out the trials
@@ -66,18 +88,34 @@ for subs = 1:20
             
             % button status = 23
             idxDepress = thisdata(:,23) == 1;
-            xPosDepress = thisdata(idxDepress, 19);
-            yPosDepress = thisdata(idxDepress, 20);
+            xPos = thisdata(idxDepress, 19);
+            yPos = thisdata(idxDepress, 20);
+            
+            
+            for thisI = 1:sum(idxDepress)
+                
+                col = find(xvec > xPos(thisI), 1, 'first');
+                row = find(yvec > yPos(thisI), 1, 'first');
+                
+                gdmat(row,col) = gdmat(row,col) + 1;
+                
+            end
             
 
-            plot(xPosDepress, yPosDepress, '.'); axis([-2 2 2 6])
             
-        end % difficulti
+        end % subs
         
         
+        subplot(3,3,subpnum)
+        colormap(custcmap)
+        heatmap(gdmat)
+        title(['All Subs. ' subjectInitial{mode} ':' difficultyName{di}])
+        drawnow
+        pause(0.1)
         
-    end %  mode
+        subpnum = subpnum + 1;
+    end %  difficulty
     
     
     
-end % subs
+end % mode
