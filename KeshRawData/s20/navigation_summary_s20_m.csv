@@ -1,0 +1,4 @@
+mode,path_radius,total_time,num_collisions,time_colliding,num_stops,time_stopping,distance_traveled_ft,speed_ft_per_second
+M,L,152999,35,98363,37,15090,411.210824,2.687654
+M,M,172636,35,107636,60,20181,415.716312,2.408047
+M,S,230454,55,144454,32,13636,417.053267,1.809700
