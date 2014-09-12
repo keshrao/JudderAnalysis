@@ -12,6 +12,13 @@ difficulty = [2,1,0];
 difficultyName = {'L', 'M', 'S'};
 modeColor = {'b','g','r'};
 
+tx = [ -1.3944   -1.3334   -1.2142   -1.0419   -0.8241   -0.5703   -0.2915 ... 
+         0    0.2915    0.5703    0.8241    1.0419    1.2142    1.3334  1.3944];
+
+ty = [ 3.3650    3.9448    2.8105    4.4497    2.3773    4.7924    2.140 ...
+    4.9136    2.1402    4.7924    2.3773    4.4497    2.8105    3.9448 3.3650];
+
+targScales = [0.1353,0.1353,0.1353, 0.0902,0.0902,0.0902, 0.0451,0.0451,0.0451].*100;
 
 % create my own colormap
 custcmap = buildcmap('wbr');
@@ -25,7 +32,7 @@ colormap(custcmap);
 
 div = 40;
 xvec = linspace(-2,2,div);
-yvec = linspace(2,6,div);
+yvec = linspace(2,7,div);
 [xgd, ygd] = meshgrid(xvec, yvec);
 
 
@@ -108,7 +115,7 @@ for mode = 1:3;
         
         subplot(3,3,subpnum)
         colormap(custcmap)
-        heatmap(gdmat)
+        heatmap(gdmat);
         title(['All Subs. ' subjectInitial{mode} ':' difficultyName{di}])
         drawnow
         pause(0.1)
@@ -119,3 +126,16 @@ for mode = 1:3;
     
     
 end % mode
+
+
+% %draw the target locations over that
+% for subpnum = 1:9
+%     
+%     subplot(3,3,subpnum)
+%     hold on
+%     plot(tx,ty, '--bo', 'LineWidth', 3, 'MarkerSize', targScales(subpnum))
+%     ylim([-5 40])
+% end
+% 
+
+
