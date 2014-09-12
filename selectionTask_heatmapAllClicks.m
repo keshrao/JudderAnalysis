@@ -30,7 +30,7 @@ subpnum = 1;
 colormap(custcmap);
 
 
-div = 40;
+div = 60;
 xvec = linspace(-2,2,div);
 yvec = linspace(2,7,div);
 [xgd, ygd] = meshgrid(xvec, yvec);
@@ -121,21 +121,11 @@ for mode = 1:3;
         pause(0.1)
         
         subpnum = subpnum + 1;
+        
+        
+        save([subjectInitial{mode} '_' difficultyName{di}], 'gdmat')
     end %  difficulty
     
     
     
 end % mode
-
-
-% %draw the target locations over that
-% for subpnum = 1:9
-%     
-%     subplot(3,3,subpnum)
-%     hold on
-%     plot(tx,ty, '--bo', 'LineWidth', 3, 'MarkerSize', targScales(subpnum))
-%     ylim([-5 40])
-% end
-% 
-
-
