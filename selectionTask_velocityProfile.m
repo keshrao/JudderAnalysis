@@ -1,6 +1,7 @@
 % plot the velocity profile of the hand trajectory
 % separated by normal (L,M,S), judder (L,M,S), masking (L,M,S)
 % also shown is the mean end time for each condition
+clear
 
 subjectIDs = {'s1', 's2', 's3','s4','s5','s6', 's7', 's8','s9','s10', ...
                 's11', 's12', 's13', 's14','s15','s16', 's17', 's18', 's19', 's20'};
@@ -20,7 +21,7 @@ for subs = 1:length(subjectIDs)
         continue
     end
     
-    %figure(1), clf
+    figure(1), clf
     
     for mode = 1:3  %normal, masking, judder
 
@@ -111,6 +112,12 @@ for subs = 1:length(subjectIDs)
 
                 starti = starti + (idxEnd(trli)-starti) + 1;
             end
+            
+            
+            % time between successive time points
+            % either 55Hz or 11Hz
+            numIdx1Sec = round(1/scaling);
+            
 
             % find the time each trial took in ms
             trldurs = nan(length(trlTS),1);
@@ -126,17 +133,12 @@ for subs = 1:length(subjectIDs)
                     trldurs(trli) = nan;
                 end
                 
-                thismaxval(trli) = nanmax(velprof(trli,:));
+                thismaxval(trli) = nanmax(velprof(trli,1:numIdx1Sec));
             end
             
-            plot(thismaxval,'b'); hold on
             
             % some sanity checks
-            thismaxval(thismaxval > 60) = [];
-            
-            plot(thismaxval,'r')
-            title(subjectIDs{subs})
-            drawnow
+            thismaxval(thismaxval > 45) = [];
             
             %store the mean and stds of the max values
             maxspeedsMean(mode, di, subs) = nanmean(thismaxval);
@@ -146,27 +148,24 @@ for subs = 1:length(subjectIDs)
             meanprof = nanmean(velprof,1);
             stdprof = nanstd(velprof,1);
 
-            % time between successive time points
-            % either 55Hz or 11Hz
-            numIdx1Sec = round(1/scaling);
 
-%             % plotting
-%             subplot(3,1,mode), hold all
-%             h = plot(linspace(0,1,numIdx1Sec),meanprof(1:numIdx1Sec), colors{diffi+1}, 'LineWidth', 3);
-%             htot = [htot, h];
-%             
-%             % show when the trial ended
-%             plot([nanmean(trldurs) nanmean(trldurs)]./1000, [0 max(meanprof)], colors{diffi+1}, 'LineWidth', 2)
-%             
-%             title(['Sujbect: ' subject ', Mode: ' subIn])
-%             ylim([0 15])
-%             xlim([0 2.5])
-%             
-%             
-%             if mode == 1 && diffi == 0
-%                 legend(htot, {'Easy','Medium','Hard'})
-%             end
-%             drawnow
+            % plotting
+            subplot(3,1,mode), hold all
+            h = plot(linspace(0,1,numIdx1Sec),meanprof(1:numIdx1Sec), colors{diffi+1}, 'LineWidth', 3);
+            htot = [htot, h];
+            
+            % show when the trial ended
+            plot([nanmean(trldurs) nanmean(trldurs)]./1000, [0 nanmax(meanprof(1:numIdx1Sec))], colors{diffi+1}, 'LineWidth', 2)
+            
+            title(['Sujbect: ' subject ', Mode: ' subIn])
+            ylim([0 15])
+            xlim([0 2.5])
+            
+            
+            if mode == 1 && diffi == 0
+                legend(htot, {'Easy','Medium','Hard'})
+            end
+            drawnow
             
             % just to view, plot all the overlaid individual trials
 %             figure(subs+1)
@@ -184,7 +183,7 @@ for subs = 1:length(subjectIDs)
     
     
     %saveas(gcf, subject, 'pdf')
-    
+    fprintf('Subject: %s \n', subject)
 end %sub
 
 %% compress data from subjects
@@ -204,7 +203,7 @@ end %sub
 
 
 allsubsMean = nanmean(maxspeedsMean,3);
-allsubsStd = nanstd(maxspeedsStd(:,:,1:4),1, 3);
+allsubsStd = nanstd(maxspeedsStd,1, 3);
 
 figure(25)
 barweb(allsubsMean, allsubsStd, 1, {'Normal','Judder','Masking'});
